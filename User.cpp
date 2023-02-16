@@ -6,7 +6,7 @@
 /*   By: blind-eagle <blind-eagle@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/05 02:16:12 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/02/05 12:25:06 by blind-eagle      ###   ########.fr       */
+/*   Updated: 2023/02/08 17:26:10 by blind-eagle      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,8 +82,8 @@ void    User::setPassword(std::string passwd){
     this->_password = passwd;
 }
 
-void    User::setPollRead(std::string msg){
-    this->_pollRead = msg;
+void    User::setPollExtractedData(std::string msg){
+    this->_pollExtractedData = msg;
 }
 // -getters- :
 
@@ -107,8 +107,12 @@ std::string    User::getDefaultPasswd() const{
     return (this->_defaultPasswd);
 }
 
-std::string    User::getPollRead() const{
-    return (this->_pollRead);
+std::string    User::getPollExtractedData() const{
+    return (this->_pollExtractedData);
+}
+
+void    User::joinPollExtractedData(char *data){
+    this->_pollExtractedData += data;
 }
 
 bool      User::isAuthenticated() const{

@@ -6,7 +6,7 @@
 /*   By: blind-eagle <blind-eagle@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/05 02:16:10 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/02/05 12:25:36 by blind-eagle      ###   ########.fr       */
+/*   Updated: 2023/02/08 17:25:28 by blind-eagle      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ class   User{
         std::string     _defaultPasswd;
         pollfd          _pollFds;
         bool            _isAuthenticated;
-        std::string     _pollRead;
+        std::string     _pollExtractedData;
     public  :
         User();
         User(pollfd newUserByFd);
@@ -46,7 +46,7 @@ class   User{
     void  setNickName(std::string nickName);
     void  setPassword(std::string passwd);
     void  setDefaultPasswd(std::string passwd);
-    void  setPollRead(std::string msg);
+    void  setPollExtractedData(std::string msg);
 
     // -getters- :
 
@@ -55,8 +55,9 @@ class   User{
     std::string     getHostName() const;
     std::string     getNickName() const;
     std::string     getDefaultPasswd() const;
-    std::string     getPollRead() const;
+    std::string     getPollExtractedData() const;
     
+    void    joinPollExtractedData(char *data);
     
     bool    isAuthenticated() const;
     bool    Authenticate(std::string serverPasswd);
