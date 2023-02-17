@@ -6,7 +6,7 @@
 /*   By: blind-eagle <blind-eagle@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/05 12:28:55 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/02/12 03:34:03 by blind-eagle      ###   ########.fr       */
+/*   Updated: 2023/02/17 18:27:56 by blind-eagle      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,7 +164,7 @@ void    Server::handlingEvents(){
                 readStatus = read(it->fd, buffer, 4096);
                 this->_users[index].joinPollExtractedData(buffer);
                 //optional :
-                printf("The buffer : %s\n",buffer);
+                // printf("The buffer : %s\n",buffer);
                 // there is nothing to read from the client and the file descriptor is closed :
                 if (readStatus == 0){
                     printf("fd : %d | revents: %d\n", it->fd, it->revents);
@@ -227,6 +227,8 @@ int   Server::parser(std::string buffer, int index){
     std::string     command;
     std::string     line;
     
+    std::cout << "The buffer : "<< buffer << std::endl;
+    std::cout  << "the pollData is : " << _users[index].getPollExtractedData() << std::endl; 
     
     while (i < buffer.size()){
         int posPointer;
@@ -242,10 +244,11 @@ int   Server::parser(std::string buffer, int index){
         else{
                 command = getWordInLine(line,&(posPointer));
         }
-        if (!checkCommandValidation(command))
-        {
-            std::cout << "Invalid Command !" << std::endl;
-        }
+        std::cout << " Command is : " << command << std::endl;
+        // if (!checkCommandValidation(command))
+        // {
+        //     std::cout << "Invalid Command !" << std::endl;
+        // }
         if (command == "PASS"){
             std::cout << "The Command Is : PASS" << std::endl;
         }
@@ -258,7 +261,6 @@ int   Server::parser(std::string buffer, int index){
             std::string     hostName = getWordInLine(line, &(posPointer));
             std::string     serverName = getWordInLine(line, &(posPointer));
             std::string     realName = getWordInLine(line, &(posPointer));
-            
         }
         else if (!_users[index].isAuthenticated()){
             std::cout << "The User is not logged in !" << std::endl;

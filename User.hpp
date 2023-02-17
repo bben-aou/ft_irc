@@ -6,7 +6,7 @@
 /*   By: blind-eagle <blind-eagle@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/05 02:16:10 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/02/08 17:25:28 by blind-eagle      ###   ########.fr       */
+/*   Updated: 2023/02/17 18:04:38 by blind-eagle      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ class   User{
     std::string     getNickName() const;
     std::string     getDefaultPasswd() const;
     std::string     getPollExtractedData() const;
+    pollfd          getPollFds() const;
     
     void    joinPollExtractedData(char *data);
     

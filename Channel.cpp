@@ -6,7 +6,7 @@
 /*   By: blind-eagle <blind-eagle@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 03:46:09 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/02/16 12:22:05 by blind-eagle      ###   ########.fr       */
+/*   Updated: 2023/02/17 17:57:12 by blind-eagle      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ std::vector<std::string>    Channel::getChannelOperators(){
     return (_channelOperators);
 }
 
-unsigned int    Channel::getMaxMembers() const{
+size_t    Channel::getMaxMembers() const{
     return (_maxMembers);
 }
 
@@ -122,7 +122,7 @@ bool    Channel::setChannelTopic(std::string user, std::string channelTopic){
     return (false);
 }
 
-bool    Channel::setMaxMembers(std::string user, unsigned int maxChannelMember){
+bool    Channel::setMaxMembers(std::string user, size_t maxChannelMember){
     if (checkSuperUserPermission(user)){
         _maxMembers = maxChannelMember;
         return (true);
@@ -197,6 +197,21 @@ bool    Channel::checkSetTopicPermission(std::string user){
     return (false);
 }
 
+bool    Channel::checkIfChannelIsFull(){
+    if (_channelMembers.size() == _maxMembers)
+        return (true);
+    return (false);
+}
+
+bool    Channel::checkIfUserAllowedToMessageChannel(std::string user){
+    std::vector<std::string>::const_iterator it;
+    if (_allowOutMessages)
+        return (true);
+    if (checkMemberExistence(user))
+        return (true);
+    return (false);
+}
+
 //* -Manage Channel- :
 
 void    Channel::addUserToChannelOperators(std::string nickName){
@@ -208,7 +223,7 @@ void    Channel::addUserToChannelOperators(std::string nickName){
 }
 
 void    Channel::deleteUserFromChannelOperators(std::string nickName){
-    std::vector<std::string>::const_iterator it;
+    std::vector<std::string>::iterator it;
     if (checkMemberExistence(nickName)){
         for (it = _channelOperators.begin(); it != _channelOperators.end(); it++){
             if (*it == nickName){
@@ -217,4 +232,56 @@ void    Channel::deleteUserFromChannelOperators(std::string nickName){
             }
         }
     }
+}
+
+bool    Channel::addUserToChannel(std::string nickName){
+    std::vector<std::string>::const_iterator it;
+    if (_maxMembers != 0 && checkIfChannelIsFull())
+        return (false);
+    for (it = _channelMembers.begin(); it != _channelMembers.end(); it++){
+        if (*it == nickName)
+            return (false);
+    }
+    _channelMembers.push_back(nickName);
+    return (true);
+}
+
+
+bool    Channel::deleteUserFromChannel(std::string nickName){
+    std::vector<std::string>::iterator it;
+    for (it = _channelMembers.begin(); it != _channelMembers.end(); it++){
+        if (*it == nickName)
+            break;
+    }
+    if (it == _channelMembers.end())
+        return (false);
+    _channelMembers.erase(it);
+    for (it = _channelOperators.begin(); it != _channelOperators.end(); it++)
+        if (*it == nickName)
+            break;
+    if (it != _channelOperators.end())
+        _channelOperators.erase(it);
+    return (true);
+}
+
+bool    Channel::changeUserNickName(std::string currentNickName, std::string newNickName){
+    std::vector<std::string>::iterator it;
+    
+    if (!checkMemberExistence(currentNickName))
+        return (false);
+    for (it = _channelMembers.begin(); it != _channelMembers.end(); it++){
+        if (*it == currentNickName){
+            *it = newNickName;
+            break;
+        }
+    }
+    if (checkSuperUserPermission(currentNickName)){
+        for (it = _channelOperators.begin(); it != _channelOperators.end(); it++){
+            if (*it == currentNickName){
+                *it = newNickName;
+                break;
+        }
+        }
+    }
+    return (true);
 }

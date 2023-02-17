@@ -6,7 +6,7 @@
 /*   By: blind-eagle <blind-eagle@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/05 02:16:12 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/02/08 17:26:10 by blind-eagle      ###   ########.fr       */
+/*   Updated: 2023/02/17 18:05:26 by blind-eagle      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,10 @@ std::string    User::getDefaultPasswd() const{
 
 std::string    User::getPollExtractedData() const{
     return (this->_pollExtractedData);
+}
+
+pollfd      User::getPollFds() const{
+    return (this->_pollFds);
 }
 
 void    User::joinPollExtractedData(char *data){
