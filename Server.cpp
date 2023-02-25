@@ -6,7 +6,7 @@
 /*   By: blind-eagle <blind-eagle@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/05 12:28:55 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/02/17 18:27:56 by blind-eagle      ###   ########.fr       */
+/*   Updated: 2023/02/24 19:05:16 by blind-eagle      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,8 +59,7 @@ std::vector<pollfd> Server::getFds(){
 void    Server::establishListening(){
     pollfd      socketFd;
     int         bindStatus;
-    int         listenStatus;
-    
+    int         listenStatus;    
     // Creation socket for the server and check it's status 
     socketFd.fd = socket(AF_INET, SOCK_STREAM, 0);
     if (socketFd.fd < 0){
@@ -102,7 +101,7 @@ void    Server::establishListening(){
 void    Server::handlingEvents(){
     int     pollStatus = 0;
     char    buffer[4096];
-    int     command;
+    // int     command;
 
     while (true){
         // reach for the file descriptors who's available to be read or write in 
@@ -162,7 +161,9 @@ void    Server::handlingEvents(){
                 readStatus = 1;
                 memset(buffer,'\0',4096);
                 readStatus = read(it->fd, buffer, 4096);
+                // printf("first : %s\n",buffer);
                 this->_users[index].joinPollExtractedData(buffer);
+                // std::cout << "Test  :" << _users[index].getPollExtractedData();
                 //optional :
                 // printf("The buffer : %s\n",buffer);
                 // there is nothing to read from the client and the file descriptor is closed :
@@ -172,18 +173,25 @@ void    Server::handlingEvents(){
                     close(it->fd);
                     it = this->_fds.erase(it);
                     this->_users.erase(_users.begin() + index);
-                    it = this->_fds.begin();
-                    it++;
+                    it = this->_fds.begin() + 1;
                     index = 0;
                     continue;
-                }                
-            //    std::cout << "The content : " << _users[index].getPollExtractedData() << std::endl;
-                else if (command = itsCommand(_users[index].getPollExtractedData())){
+                }
+                // else{
+                //     command = itsCommand(_users[index].getPollExtractedData());
+                //     std::cout  << "start the pollData is : " << _users[index].getPollExtractedData().substr(0, command) << " end "<< std::endl; 
+                //     std::cout << "Size : " <<  _users[index].getPollExtractedData().size() << "\n";
+                // }
+
+                else if (int command = itsCommand(_users[index].getPollExtractedData())){
+                    // std::cout << "number : " << command << std::endl;
+                    // std::cout << "Size   : " << _users[index].getPollExtractedData().size() << std::endl;
                     // std::cout << "Yes it's command!" << std::endl;
                     // need to handle the commands;
+                    // std::cout << "Test  :" << _users[index].getPollExtractedData() << std::endl;
                     parser(_users[index].getPollExtractedData().substr(0, command), index);
+                    _users[index].setPollExtractedData(_users[index].getPollExtractedData().substr(command + 1, _users[index].getPollExtractedData().size() - (command + 1)));
                 }
-                _users[index].setPollExtractedData(_users[index].getPollExtractedData().substr(command + 1, _users[index].getPollExtractedData().size() - (command + 1)));
             }
             index++;
             it++;
@@ -205,33 +213,55 @@ int    Server::itsCommand(std::string  line){
 std::string     Server::getWordInLine(std::string line, int *posPointer) const{
     std::string     word;
     while (line[*posPointer] == ' ')
-        *posPointer++;
+        *posPointer += 1;
     if (line[*posPointer] == ':'){
         *posPointer += 1;
         while (line[*posPointer] != '\r' && line[*posPointer]){
             word +=  line[*posPointer];
-            *posPointer++;
+            *posPointer += 1;
         }
     }
     else{
         while (line[*posPointer] != ' ' && line[*posPointer] != '\r' && line[*posPointer]){
             word +=  line[*posPointer];
-            *posPointer++;
+            *posPointer += 1;
         }
     }
     return (word);
 }
+
+std::vector<std::string>     Server::getVectorOfArgs(std::string line, int* posPointer){
+    std::string tmpStr;
+    std::vector<std::string> argsVector;
+
+    while (line[*posPointer] != '\r' && line[*posPointer])
+    {
+        tmpStr.clear();
+        while (line[*posPointer] == ' ' ||  line[*posPointer] == ',')
+            *posPointer += 1;
+        if (line[*posPointer] == ':')
+            return (argsVector);
+        while (line[*posPointer] != ' ' && line[*posPointer] != ','  && line[*posPointer] != '\r' && line[*posPointer]){
+            tmpStr = tmpStr + line[*posPointer];
+            *posPointer = *posPointer + 1;
+        }
+        argsVector.push_back(tmpStr);
+    }
+    return (argsVector);
+}
+
+
 
 int   Server::parser(std::string buffer, int index){
     int  i = 0;
     std::string     command;
     std::string     line;
     
-    std::cout << "The buffer : "<< buffer << std::endl;
-    std::cout  << "the pollData is : " << _users[index].getPollExtractedData() << std::endl; 
+    // std::cout << "The buffer : "<< buffer << std::endl;
+    // std::cout  << "the pollData is : " << _users[index].getPollExtractedData() << std::endl; 
     
     while (i < buffer.size()){
-        int posPointer;
+        int posPointer = 0;
         while (buffer[i] && buffer[i] != '\r'){
             line += buffer[i];
             i++;
@@ -251,9 +281,11 @@ int   Server::parser(std::string buffer, int index){
         // }
         if (command == "PASS"){
             std::cout << "The Command Is : PASS" << std::endl;
+            pass(&_users[index], getWordInLine(line,&(posPointer)));
         }
         else if (command == "NICK"){
             std::cout << "The Command Is : NICK" << std::endl;
+            nick(&_users[index], getWordInLine(line, &(posPointer)));
         }
         else if (command == "USER"){
             std::cout << "The Command Is : USER" << std::endl;
@@ -261,12 +293,19 @@ int   Server::parser(std::string buffer, int index){
             std::string     hostName = getWordInLine(line, &(posPointer));
             std::string     serverName = getWordInLine(line, &(posPointer));
             std::string     realName = getWordInLine(line, &(posPointer));
+            user(&_users[index], userName, hostName, serverName, realName);
         }
-        else if (!_users[index].isAuthenticated()){
-            std::cout << "The User is not logged in !" << std::endl;
-        }
+        // else if (!_users[index].isAuthenticated()){
+        //     userNotLoginIn(&_users[index]);
+        //     std::cout << "The User is not logged in !" << std::endl;
+        // }
         else if (command == "JOIN"){
-            std::cout << "The Command Is : JOIN" << std::endl;
+            // std::cout << "The Command Is : JOIN" << std::endl;
+            std::vector<std::string> argVector;
+            std::vector<std::string>::const_iterator it;
+            argVector = getVectorOfArgs(line, &(posPointer));
+            for (it = argVector.begin(); it != argVector.end(); ++it)
+                std::cout << *it << std::endl;
         }
         else if (command == "QUIT"){
             std::cout << "The Command Is : QUIT" << std::endl;
@@ -331,6 +370,44 @@ bool    Server::checkCommandValidation(std::string command){
         return (true);
     return (false);
 }
+
+void    Server::sendResponse(pollfd fds, std::string data) const{
+    std::string     prefix;
+    std::string     response;
+    int             prefixPos;
+    prefixPos = 0;
+    if (data[0] == ':'){
+        prefixPos = 1;
+        prefix = getWordInLine(data, &prefixPos);
+        prefix = ":" + prefix; 
+    }
+    int i = prefixPos;
+    while (data[i]){
+        response += prefix;
+        while (response.size() < 510 && data[i]){
+            response += data[i];
+            i++;
+        }
+        response += '\r';
+        response += '\n';
+        send(fds.fd, response.c_str(), response.size(),0);
+        response.clear();
+    }
+}
+
+//* -Utils- :
+
+std::string     Server::generatePrefix(User const *user) const{
+    std::string  prefix = "";
+    if (user == NULL){
+        prefix = ":" + _serverName + " ";
+        return (prefix);
+    }
+    prefix.append(":" + user->getNickName() + "!" + user->getUserName());
+    prefix.append("@" + user->getHostName() + " ");
+    return (prefix);
+}
+
 
 
 Server::~Server(){}

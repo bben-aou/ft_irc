@@ -6,7 +6,7 @@
 /*   By: blind-eagle <blind-eagle@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 03:46:09 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/02/17 17:57:12 by blind-eagle      ###   ########.fr       */
+/*   Updated: 2023/02/23 18:04:28 by blind-eagle      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,6 +174,7 @@ bool    Channel::checkSuperUserPermission(std::string user){
     }
     if (it == _channelOperators.end())
         return (false);
+    return (false);
 }
 
 bool    Channel::checkMemberExistence(std::string memberName){
@@ -184,6 +185,7 @@ bool    Channel::checkMemberExistence(std::string memberName){
     }
     if (it == _channelMembers.end())
         return (false);
+    return (false);
 }
 
 bool    Channel::checkSetTopicPermission(std::string user){
@@ -285,3 +287,5 @@ bool    Channel::changeUserNickName(std::string currentNickName, std::string new
     }
     return (true);
 }
+
+Channel::~Channel(){};

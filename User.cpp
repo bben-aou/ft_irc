@@ -6,7 +6,7 @@
 /*   By: blind-eagle <blind-eagle@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/05 02:16:12 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/02/17 18:05:26 by blind-eagle      ###   ########.fr       */
+/*   Updated: 2023/02/22 01:26:16 by blind-eagle      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,7 @@ pollfd      User::getPollFds() const{
 }
 
 void    User::joinPollExtractedData(char *data){
+    
     this->_pollExtractedData += data;
 }
 
@@ -124,7 +125,7 @@ bool      User::isAuthenticated() const{
 }
 
 bool     User::Authenticate(std::string serverPasswd){
-    if (!(this->_userName.empty()) && !(this->_realName.empty()) && !(this->_nickName.empty()) && this->_defaultPasswd == serverPasswd){
+    if (!(this->_userName.empty()) && !(this->_realName.empty()) && !(this->_nickName.empty()) && this->_password == serverPasswd){
         this->_isAuthenticated = true;
         return (true);
     }

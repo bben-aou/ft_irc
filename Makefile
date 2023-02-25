@@ -6,7 +6,7 @@
 #    By: blind-eagle <blind-eagle@student.42.fr>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/08 15:11:24 by blind-eagle       #+#    #+#              #
-#    Updated: 2023/02/12 02:57:44 by blind-eagle      ###   ########.fr        #
+#    Updated: 2023/02/23 17:58:41 by blind-eagle      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,11 +16,14 @@ NAME = ft_irc
 CFLAGS = -Wall -Wextra -Werror -std=c++98
 
 SRC = User.cpp \
+	  Channel.cpp \
 	  Commands.cpp \
 	  Server.cpp \
+	  utilsServer.cpp \
 	  main.cpp \
 
 HDRS = User.hpp \
+	   Channel.hpp \
 	   Commands.hpp \
 	   Server.hpp \
 	   main.hpp \
