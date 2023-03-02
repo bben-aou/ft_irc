@@ -6,7 +6,7 @@
 /*   By: blind-eagle <blind-eagle@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/05 12:28:55 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/02/24 19:05:16 by blind-eagle      ###   ########.fr       */
+/*   Updated: 2023/03/01 12:36:43 by blind-eagle      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,7 +189,16 @@ void    Server::handlingEvents(){
                     // std::cout << "Yes it's command!" << std::endl;
                     // need to handle the commands;
                     // std::cout << "Test  :" << _users[index].getPollExtractedData() << std::endl;
-                    parser(_users[index].getPollExtractedData().substr(0, command), index);
+                    if (parser(_users[index].getPollExtractedData().substr(0, command), index) == 1){
+						printf("fd = %d et revent = %d\n", it->fd, it->revents);
+                        close(it->fd);
+                        it = _fds.erase(it);
+                        _users.erase(_users.begin() + index);
+                        it = _fds.begin() + 1;
+                        index = 0;
+                        continue;
+                    }
+                        
                     _users[index].setPollExtractedData(_users[index].getPollExtractedData().substr(command + 1, _users[index].getPollExtractedData().size() - (command + 1)));
                 }
             }
@@ -304,33 +313,53 @@ int   Server::parser(std::string buffer, int index){
             std::vector<std::string> argVector;
             std::vector<std::string>::const_iterator it;
             argVector = getVectorOfArgs(line, &(posPointer));
-            for (it = argVector.begin(); it != argVector.end(); ++it)
-                std::cout << *it << std::endl;
+            // for (it = argVector.begin(); it != argVector.end(); ++it)
+            //     std::cout << *it << std::endl;
+            join(&_users[index],argVector);
         }
         else if (command == "QUIT"){
             std::cout << "The Command Is : QUIT" << std::endl;
+            std::string quitMessage = getWordInLine(line, &(posPointer));
+            std::cout << quitMessage << std::endl;
+            // quit(&_users[index], quitMessage);
             return (1);
         }
         else if (command == "PART"){
             std::cout << "The Command Is : PART" << std::endl;
+            std::vector<std::string> channels = getVectorOfArgs(line, &(posPointer));
+            std::string              partReasonMessage = getWordInLine(line, &(posPointer));
+            part(&_users[index], channels, partReasonMessage);   
         }
         else if (command == "PING"){
             std::cout << "The Command Is : PING" << std::endl;
+            std::string message = getWordInLine(line, &(posPointer));
+            pong(&_users[index], message);
         }
         else if (command == "LIST"){
             std::cout << "The Command Is : LIST" << std::endl;
+            std::vector<std::string>    channelsArgs = getVectorOfArgs(line, &(posPointer));
+            list(&_users[index], channelsArgs);
         }
         else if (command == "KICK"){
             std::cout << "The Command Is : KICK" << std::endl;
         }
         else if (command == "PRIVMSG"){
             std::cout << "The Command Is : PRIVMSG" << std::endl;
+            std::vector<std::string>  targets = getVectorOfArgs(line, &(posPointer));
+            std::string               message = getWordInLine(line, &(posPointer));
+            privmsg(&_users[index], targets, message);
         }
         else if (command == "MODE"){
             std::cout << "The Command Is : MODE" << std::endl;
+            std::string target = getWordInLine(line, &(posPointer));
+            std::vector<std::string> args = getVectorOfArgs(line, &(posPointer));
+            mode(&_users[index], target, args);
         }
         else if (command == "NOTICE"){
             std::cout << "The Command Is : NOTICE" << std::endl;
+            std::vector<std::string>    targets = getVectorOfArgs(line, &(posPointer));
+            std::string                 NoticeMessage = getWordInLine(line, &(posPointer));
+            notice(&_users[index], targets, NoticeMessage);
         }
         else if (command == "TOPIC"){
             std::cout << "The Command Is : TOPIC" << std::endl;

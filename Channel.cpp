@@ -6,7 +6,7 @@
 /*   By: blind-eagle <blind-eagle@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 03:46:09 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/02/23 18:04:28 by blind-eagle      ###   ########.fr       */
+/*   Updated: 2023/03/01 03:54:35 by blind-eagle      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,7 +177,7 @@ bool    Channel::checkSuperUserPermission(std::string user){
     return (false);
 }
 
-bool    Channel::checkMemberExistence(std::string memberName){
+bool    Channel::checkMemberExistence(std::string memberName) const{
     std::vector<std::string>::const_iterator it;
     for(it = _channelMembers.begin(); it != _channelMembers.end(); it++){
         if (*it == memberName)
@@ -205,7 +205,7 @@ bool    Channel::checkIfChannelIsFull(){
     return (false);
 }
 
-bool    Channel::checkIfUserAllowedToMessageChannel(std::string user){
+bool    Channel::checkIfUserAllowedToMessageChannel(std::string user) const{
     std::vector<std::string>::const_iterator it;
     if (_allowOutMessages)
         return (true);
@@ -286,6 +286,14 @@ bool    Channel::changeUserNickName(std::string currentNickName, std::string new
         }
     }
     return (true);
+}
+
+std::vector<std::string>::const_iterator const  Channel::beginMem() const{
+    return (_channelMembers.begin());
+}
+
+std::vector<std::string>::const_iterator  const Channel::endMem() const{
+    return (_channelMembers.end());
 }
 
 Channel::~Channel(){};
