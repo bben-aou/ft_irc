@@ -6,7 +6,7 @@
 /*   By: blind-eagle <blind-eagle@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/05 12:28:52 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/03/01 12:28:43 by blind-eagle      ###   ########.fr       */
+/*   Updated: 2023/03/03 17:03:19 by blind-eagle      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,9 @@ class   Server{
         void    notice(User* user, std::vector<std::string> & targets, std::string noticeMessage) const;
         void    list(User* user, std::vector<std::string> & channels) const;
         void    mode(User* user, std::string target, std::vector<std::string> modes);
+        void    topic(User* user, std::string channel, std::string topic);
+        void    kick(User *user, std::string channel, std::string target, std::string reason);
+        void    names(User * user, std::string channel);
 
     public  :
         Server();

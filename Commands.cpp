@@ -6,7 +6,7 @@
 /*   By: blind-eagle <blind-eagle@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 02:53:28 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/03/01 12:31:32 by blind-eagle      ###   ########.fr       */
+/*   Updated: 2023/03/03 18:13:38 by blind-eagle      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -349,7 +349,7 @@ void    Server::privmsg(User *user, std::vector<std::string> & targets, std::str
     }
 }
 
-// & ------------- Command : + PRIVMSG + ---------------------- 
+// & ------------- Command : + NOTICE + ---------------------- 
 
 void    Server::notice(User * user, std::vector<std::string> & targets, std::string noticeMessage) const{
     std::vector<std::string>::const_iterator   targetIt;
@@ -485,11 +485,14 @@ void    Server::channelModes(User * user, Channel *channel, std::vector<std::str
                 return ;
             }
             if (channel->checkSuperUserPermission(user->getNickName())){
-                channel->addUserToChannelOperators(target->getUserName());
-                if (addMode)
+                if (addMode){
                     modeStatus = "+";
-                else if (!addMode)
+                    channel->addUserToChannelOperators(target->getNickName());
+                }
+                else if (!addMode){
                     modeStatus = "-";
+                    channel->deleteUserFromChannelOperators(target->getNickName());
+                }
                 buildResponseToSendToChanMembers(user, *channel, generatePrefix(user) + "MODE " + modeStatus + "o " + target->getNickName());
                 buildResponseToSend(user, user, "MODE " + channel->getChannelName() + " " + modeStatus + "o " + target->getNickName());
             }
@@ -558,6 +561,126 @@ void    Server::mode(User *user, std::string target, std::vector<std::string> mo
     }
     if (chanIt != _channels.end()){
         channelModes(user, &*chanIt, modes);
+        return ;
     }
-        
+    else{
+        buildResponseToSend(NULL, user, repliesMessage("401", user) + target + " :No such nick/channel");
+        return;
+    }
+}
+
+// & ------------- Command : + TOPIC + ---------------------- 
+
+void    Server::topic(User * user, std::string channel, std::string topic){
+    std::vector<Channel>::iterator it;
+    std::vector<std::string>::const_iterator chanMemberIt;
+    if (channel.empty()){
+        buildResponseToSend(NULL, user, repliesMessage("461", user) + "TOPIC :Not enough parameters");
+        return;
+    }
+    for (it = _channels.begin(); it != _channels.end(); ++it){
+        if (it->getChannelName() == channel)
+            break;
+    }
+    if (!(it->checkMemberExistence(user->getNickName())) || it == _channels.end()){
+        buildResponseToSend(NULL, user, repliesMessage("442", user) + channel + " :You're not on that channel");
+        return;
+    }
+    if (topic.empty()){
+        if (it->getChannelTopic().empty())
+            buildResponseToSend(NULL, user, repliesMessage("331", user) + channel + " :No topic is set");
+        else
+            buildResponseToSend(NULL, user, repliesMessage("332", user) + channel + " :" + it->getChannelTopic());
+    }
+    else if (it->setChannelTopic(user->getNickName(), topic)){
+        for (chanMemberIt = it->beginMem(); chanMemberIt != it->endMem(); ++chanMemberIt)
+            buildResponseToSend(NULL, getUser(*chanMemberIt), repliesMessage("332", getUser(*chanMemberIt)) + channel + " :" + it->getChannelTopic());
+    }
+    else
+    {
+        buildResponseToSend(NULL, user, repliesMessage("482", user) + channel + " :You're not channel operator");
+        return;    
+    }
+}
+
+// & ------------- Command : + KICK + ---------------------- 
+
+void    Server::kick(User * user, std::string channel, std::string target, std::string reason){
+    std::vector<Channel>::iterator      chanIt;
+    std::vector<User>::const_iterator  userIt;
+    std::string msg;
+
+    if (channel.empty() || target.empty()){
+        buildResponseToSend(NULL, user, repliesMessage("461", user) + "KICK :Not enough parameters");
+        return;
+    }
+    for (chanIt = _channels.begin(); chanIt != _channels.end(); ++chanIt){
+        if (chanIt->getChannelName() == channel)
+            break;
+    }
+    if (chanIt == _channels.end()){
+        buildResponseToSend(NULL, user, repliesMessage("403", user) + channel + " :No such channel");
+        return;
+    }
+    if (!(chanIt->checkSuperUserPermission(user->getNickName())))
+        buildResponseToSend(NULL, user, repliesMessage("482", user) + channel + " ::You're not channel operator");
+    else if (!(chanIt->deleteUserFromChannel(target)))
+        buildResponseToSend(NULL, user, repliesMessage("441", user) + target + " " + channel + " :They aren't on that channel");
+    else{
+        if (reason.empty())
+            msg = "KICK " + channel + " " + target ;
+        else 
+            msg = "KICK " + channel + " " + target + " " + reason;
+        for (userIt = _users.begin(); userIt != _users.end() ; ++userIt){
+                if (userIt->getNickName() == target)
+                    break;
+        }
+        buildResponseToSend(user, &*userIt, msg); // to notify the user that kicked out of the channel
+        buildResponseToSend(user, user, msg); // print msg to the operator who kicked out the user
+        buildResponseToSendToChanMembers(user, *chanIt, msg); // notify all the channel members that user -target- kicked out 
+    }
+}
+
+// & ------------- Command : + NAMES + ---------------------- 
+
+void    Server::names(User * user, std::string channel){
+    std::vector<Channel>::iterator  chanIt;
+    std::vector<User>::iterator     userIt;
+    std::string     channelPrefix;
+    
+    for (chanIt = _channels.begin(); chanIt != _channels.end(); ++chanIt){
+        if (chanIt->getChannelName() == channel)
+            break;
+    }
+    if (chanIt == _channels.end()){
+        buildResponseToSend(NULL, user, repliesMessage("366", user) + channel + " :End of /NAMES list");
+        return;
+    }
+    else if (!(chanIt->checkMemberExistence(user->getNickName())) && (chanIt->getPrivateChannelStatus() || chanIt->getSecretChannelStatus())){
+        if (chanIt->getPrivateChannelStatus()){
+            buildResponseToSend(NULL, user, repliesMessage("366", user) + channel + " *" + " :End of /NAMES list");
+            return;
+        }
+        else if (chanIt->getSecretChannelStatus()){
+            buildResponseToSend(NULL, user, repliesMessage("366", user) + channel + " @" + " :End of NAMES list");
+            return;
+        }
+    }
+    if (!channel.empty()){
+        if (chanIt->getPrivateChannelStatus())
+            channelPrefix = "* ";
+        else if (chanIt->getSecretChannelStatus())
+            channelPrefix = "@ ";
+        else
+            channelPrefix = "= ";
+        for (userIt = _users.begin(); userIt != _users.end(); ++userIt){
+            if (chanIt->checkMemberExistence(userIt->getNickName()))
+                buildResponseToSend(NULL, user, repliesMessage("353", user) + channelPrefix + channel + " : " + userIt->getNickName());
+        }
+        buildResponseToSend(NULL, user, repliesMessage("366", user) +  channel + " :End of NAMES list");
+    }
+    else{
+        buildResponseToSend(NULL, user, repliesMessage("461", user) + "NAMES :Not enough parameters");
+        return;
+    }   
 }
