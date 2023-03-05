@@ -6,7 +6,7 @@
 /*   By: blind-eagle <blind-eagle@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 02:53:28 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/03/03 18:13:38 by blind-eagle      ###   ########.fr       */
+/*   Updated: 2023/03/05 18:47:01 by blind-eagle      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -400,7 +400,7 @@ void    Server::list(User* user, std::vector<std::string>  & channels) const{
         }
     }
     else{
-        for (chanArgsIt = channels.begin(); chanArgsIt != channels.end(); ++chanIt){
+        for (chanArgsIt = channels.begin(); chanArgsIt != channels.end(); ++chanArgsIt){            
             for (chanIt = _channels.begin(); chanIt != _channels.end(); ++chanIt){
                 if (chanIt->getChannelName() == *chanArgsIt){
                     if (!(chanIt->getSecretChannelStatus()) || (chanIt->checkMemberExistence(user->getNickName()))){
@@ -643,44 +643,125 @@ void    Server::kick(User * user, std::string channel, std::string target, std::
 
 // & ------------- Command : + NAMES + ---------------------- 
 
-void    Server::names(User * user, std::string channel){
-    std::vector<Channel>::iterator  chanIt;
-    std::vector<User>::iterator     userIt;
-    std::string     channelPrefix;
+// void    Server::names(User * user, std::string channel){
+//     std::vector<Channel>::iterator  chanIt;
+//     std::vector<User>::iterator     userIt;
+//     std::string     channelPrefix;
     
-    for (chanIt = _channels.begin(); chanIt != _channels.end(); ++chanIt){
-        if (chanIt->getChannelName() == channel)
-            break;
-    }
-    if (chanIt == _channels.end()){
-        buildResponseToSend(NULL, user, repliesMessage("366", user) + channel + " :End of /NAMES list");
-        return;
-    }
-    else if (!(chanIt->checkMemberExistence(user->getNickName())) && (chanIt->getPrivateChannelStatus() || chanIt->getSecretChannelStatus())){
-        if (chanIt->getPrivateChannelStatus()){
-            buildResponseToSend(NULL, user, repliesMessage("366", user) + channel + " *" + " :End of /NAMES list");
-            return;
+//     for (chanIt = _channels.begin(); chanIt != _channels.end(); ++chanIt){
+//         if (chanIt->getChannelName() == channel)
+//             break;
+//     }
+//     if (chanIt == _channels.end()){
+//         buildResponseToSend(NULL, user, repliesMessage("366", user) + channel + " :End of /NAMES list");
+//         return;
+//     }
+//     else if (!(chanIt->checkMemberExistence(user->getNickName())) && (chanIt->getPrivateChannelStatus() || chanIt->getSecretChannelStatus())){
+//         if (chanIt->getPrivateChannelStatus()){
+//             buildResponseToSend(NULL, user, repliesMessage("366", user) + channel + " *" + " :End of /NAMES list");
+//             return;
+//         }
+//         else if (chanIt->getSecretChannelStatus()){
+//             buildResponseToSend(NULL, user, repliesMessage("366", user) + channel + " @" + " :End of NAMES list");
+//             return;
+//         }
+//     }
+//     if (!channel.empty()){
+//         if (chanIt->getPrivateChannelStatus())
+//             channelPrefix = "* ";
+//         else if (chanIt->getSecretChannelStatus())
+//             channelPrefix = "@ ";
+//         else
+//             channelPrefix = "= ";
+//         for (userIt = _users.begin(); userIt != _users.end(); ++userIt){
+//             if (chanIt->checkMemberExistence(userIt->getNickName()))
+//                 buildResponseToSend(NULL, user, repliesMessage("353", user) + channelPrefix + channel + " : " + userIt->getNickName());
+//         }
+//         buildResponseToSend(NULL, user, repliesMessage("366", user) +  channel + " :End of NAMES list");
+//     }
+//     else{
+//         for (chanIt = _channels.begin(); chanIt != _channels.end(); ++chanIt){
+//             if (!(chanIt->checkMemberExistence(user->getNickName())) && (chanIt->getPrivateChannelStatus() || chanIt->getSecretChannelStatus())){
+//                 if (chanIt->getPrivateChannelStatus()){
+//                     buildResponseToSend(NULL, user, repliesMessage("366", user) + "*" + " :End of /NAMES list");
+//                 return;
+//                 }
+//                 else if (chanIt->getSecretChannelStatus()){
+//                     buildResponseToSend(NULL, user, repliesMessage("366", user)  + "@" + " :End of NAMES list");
+//                     return;
+//                 }
+//             }
+//             // else if (){
+                
+//             // }
+            
+//         }
+//         buildResponseToSend(NULL, user, repliesMessage("461", user) + "NAMES :Not enough parameters");
+//         return;
+//     }   
+// }
+
+
+// & ------------- Command : + NAMES V2+ ---------------------- 
+
+void    Server::names(User * user, std::vector<std::string> & channels){
+    std::vector<Channel>::iterator      chanIt;
+    std::vector<User>::iterator         userIt;
+    std::vector<std::string>::iterator  strIt;
+    std::string                         chanPrefix;
+    if (!channels.empty()){
+        for (strIt = channels.begin(); strIt != channels.end(); ++strIt){
+            for (chanIt = _channels.begin(); chanIt != _channels.end(); ++chanIt){
+                if (chanIt->getChannelName() == *strIt)
+                    break;
+            }
+            if (chanIt == _channels.end()){
+                buildResponseToSend(NULL, user, repliesMessage("366", user) + *strIt + " :End of /NAMES list");
+                return;
+            }
+            for (userIt = _users.begin(); userIt != _users.end(); ++userIt){
+                if (chanIt->getPrivateChannelStatus())
+                    chanPrefix = "* ";
+                else if (chanIt->getSecretChannelStatus())
+                    chanPrefix = "@ ";
+                else
+                    chanPrefix = "= ";
+                if (chanIt->checkMemberExistence(user->getUserName()) && (chanIt->getPrivateChannelStatus() || chanIt->getSecretChannelStatus())){
+                    if(chanIt->checkMemberExistence(userIt->getNickName()))
+                        buildResponseToSend(NULL, user, repliesMessage("353", user) + chanPrefix + *strIt + " : " + userIt->getNickName());
+                }
+                else if (!chanIt->getPrivateChannelStatus() && !chanIt->getSecretChannelStatus()){
+                    if(chanIt->checkMemberExistence(userIt->getNickName()))
+                        buildResponseToSend(NULL, user, repliesMessage("353", user) + chanPrefix + *strIt + " : " + userIt->getNickName());
+                }
+            }
+            buildResponseToSend(NULL, user, repliesMessage("366", user) +  *strIt + " :End of NAMES list");
         }
-        else if (chanIt->getSecretChannelStatus()){
-            buildResponseToSend(NULL, user, repliesMessage("366", user) + channel + " @" + " :End of NAMES list");
-            return;
-        }
-    }
-    if (!channel.empty()){
-        if (chanIt->getPrivateChannelStatus())
-            channelPrefix = "* ";
-        else if (chanIt->getSecretChannelStatus())
-            channelPrefix = "@ ";
-        else
-            channelPrefix = "= ";
-        for (userIt = _users.begin(); userIt != _users.end(); ++userIt){
-            if (chanIt->checkMemberExistence(userIt->getNickName()))
-                buildResponseToSend(NULL, user, repliesMessage("353", user) + channelPrefix + channel + " : " + userIt->getNickName());
-        }
-        buildResponseToSend(NULL, user, repliesMessage("366", user) +  channel + " :End of NAMES list");
     }
     else{
-        buildResponseToSend(NULL, user, repliesMessage("461", user) + "NAMES :Not enough parameters");
-        return;
-    }   
+        if (_channels.empty()){
+            // buildResponseToSend(NULL, user, repliesMessage("366", user) + "" + " :End of NAMES list");
+            std::cout << "there is no channel created yet !" << std::endl;
+            return;
+        }
+        for (chanIt = _channels.begin(); chanIt != _channels.end(); ++chanIt){
+            if (chanIt->getPrivateChannelStatus())
+                chanPrefix = "* ";
+            else if (chanIt->getSecretChannelStatus())
+                chanPrefix = "@ ";
+            else
+                chanPrefix = "= ";
+            if (!chanIt->checkMemberExistence(user->getNickName()) &&  (chanIt->getPrivateChannelStatus() || chanIt->getSecretChannelStatus())){
+                buildResponseToSend(NULL, user, repliesMessage("366", user) + "*" + " :End of /NAMES list");
+                continue;
+            }
+            else if ((chanIt->checkMemberExistence(user->getNickName())) || (!chanIt->getPrivateChannelStatus() && !chanIt->getSecretChannelStatus())){
+                for (userIt = _users.begin(); userIt != _users.end(); ++userIt){
+                    if (chanIt->checkMemberExistence(userIt->getNickName()))
+                        buildResponseToSend(NULL, user, repliesMessage("353", user) + chanPrefix + chanIt->getChannelName() + " : " + userIt->getNickName());
+                }
+            }
+            buildResponseToSend(NULL, user, repliesMessage("366", user) +  chanIt->getChannelName() + " :End of NAMES list");
+        }
+    }
 }

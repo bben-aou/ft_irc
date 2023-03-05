@@ -6,7 +6,7 @@
 /*   By: blind-eagle <blind-eagle@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/05 12:28:52 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/03/03 17:03:19 by blind-eagle      ###   ########.fr       */
+/*   Updated: 2023/03/05 17:02:34 by blind-eagle      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ class   Server{
         void    topic(User* user, std::string channel, std::string topic);
         void    kick(User *user, std::string channel, std::string target, std::string reason);
         void    names(User * user, std::string channel);
+        void    names(User * user, std::vector<std::string> & channels);
 
     public  :
         Server();
