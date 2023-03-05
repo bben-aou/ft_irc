@@ -6,7 +6,7 @@
 /*   By: blind-eagle <blind-eagle@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/05 12:28:55 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/03/05 17:46:18 by blind-eagle      ###   ########.fr       */
+/*   Updated: 2023/03/05 19:35:12 by blind-eagle      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -304,10 +304,10 @@ int   Server::parser(std::string buffer, int index){
             std::string     realName = getWordInLine(line, &(posPointer));
             user(&_users[index], userName, hostName, serverName, realName);
         }
-        // else if (!_users[index].isAuthenticated()){
-        //     userNotLoginIn(&_users[index]);
-        //     std::cout << "The User is not logged in !" << std::endl;
-        // }
+        else if (!_users[index].isAuthenticated()){
+            userNotLoginIn(&_users[index]);
+            std::cout << "The User is not logged in !" << std::endl;
+        }
         else if (command == "JOIN"){
             // std::cout << "The Command Is : JOIN" << std::endl;
             std::vector<std::string> argVector;
@@ -317,11 +317,17 @@ int   Server::parser(std::string buffer, int index){
             //     std::cout << *it << std::endl;
             join(&_users[index],argVector);
         }
+        else if (command == "INVITE"){
+            std::string     invitedUser = getWordInLine(line, &(posPointer));
+            std::string     channel = getWordInLine(line, &(posPointer));
+            invite(&_users[index], invitedUser, channel);   
+        }
+        
         else if (command == "QUIT"){
             std::cout << "The Command Is : QUIT" << std::endl;
             std::string quitMessage = getWordInLine(line, &(posPointer));
             std::cout << quitMessage << std::endl;
-            // quit(&_users[index], quitMessage);
+            quit(&_users[index], quitMessage);
             return (1);
         }
         else if (command == "PART"){
@@ -395,6 +401,8 @@ bool    Server::checkCommandValidation(std::string command){
     if (command == "PING")
         return (true);
     if (command == "JOIN")
+        return (true);
+    if (command == "INVITE")
         return (true);
     if (command == "PART")
         return (true);
