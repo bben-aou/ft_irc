@@ -6,7 +6,7 @@
 /*   By: blind-eagle <blind-eagle@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 02:53:28 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/03/05 19:42:22 by blind-eagle      ###   ########.fr       */
+/*   Updated: 2023/03/06 08:58:45 by blind-eagle      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -809,3 +809,4 @@ void    Server::invite(User * user, std::string invitedUser, std::string channel
         return;
     }
 }
+//comment for test
