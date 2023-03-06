@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Commands.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: blind-eagle <blind-eagle@student.42.fr>    +#+  +:+       +#+        */
+/*   By: bben-aou <bben-aou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 02:53:28 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/03/06 08:58:45 by blind-eagle      ###   ########.fr       */
+/*   Updated: 2023/03/06 15:02:17 by bben-aou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,6 @@ std::string     Server::repliesMessage(std::string errorStatus, User const *user
 
 void        Server::buildResponseToSend(User const * senderUser, User const * recipientUser, std::string data) const{
     std::string  dataToSend;
-
     dataToSend = generatePrefix(senderUser) + data;
     sendResponse(recipientUser->getPollFds(), dataToSend);
 }
@@ -170,8 +169,10 @@ void    Server::user(User* user, std::string userName, std::string hostName, std
             user->setHostName(hostName);
         user->setUserName(userName);
         user->setRealName(realName);
-        if (user->Authenticate(_password))
+        if (user->Authenticate(_password)){
+            saveLoginTime(user);
             welcome(user);
+        }
     }
 }
 
@@ -200,9 +201,6 @@ void    Server::listOfChannelMembers(Channel  & channel, User const * user) cons
         else
             permissionCharacter = '+';
         buildResponseToSend(NULL, user, repliesMessage("353", user) +  " :" + permissionCharacter + *it);
-        // buildResponseToSend(NULL, user, repliesMessage("353", user) + "Okay!!");
-
-    //     // permissionCharacter.clear();
         std::cout << channel.getChannelName() << std::endl;
     }
     buildResponseToSend(NULL,user, repliesMessage("366", user) + channel.getChannelName() + " :End of NAMES list");
@@ -226,7 +224,6 @@ void    Server::join(User* user, std::vector<std::string> & argsVector){
             buildResponseToSend(NULL, user, repliesMessage("403", user) + *argsIt + " :No such channel");
             return ;
         }
-        buildResponseToSend(user, user, "JOIN " + *argsIt);
         if (chanIt != _channels.end()){ // the cannel exist - No need to create a new one -
             for (userIt = chanIt->beginMem(); userIt != chanIt->endMem(); ++userIt){// check if the user is already in the channel
                 if (*userIt == user->getNickName())
@@ -236,10 +233,15 @@ void    Server::join(User* user, std::vector<std::string> & argsVector){
                 buildResponseToSend(NULL, user, repliesMessage("443", user) + user->getNickName()+ " " + chanIt->getChannelName() + " :is already on channel");
                 return ; 
             }
+            if (chanIt->getInviteOnlyChannelStatus()){
+                buildResponseToSend(NULL, user, repliesMessage("473", user) + chanIt->getChannelName() + " :Cannot join channel (+i)");
+                return;
+            }
             if (!(chanIt->addUserToChannel(user->getNickName()))){
                 buildResponseToSend(NULL, user, repliesMessage("471", user) + chanIt->getChannelName() + " :Cannot join channel (+l)");
                 return ;
             }
+             buildResponseToSend(user, user, "JOIN " + *argsIt);
             buildResponseToSendToChanMembers(user, *chanIt, generatePrefix(user) + "JOIN " + chanIt->getChannelName());
             topicOfChannel = chanIt->getChannelTopic();
 
@@ -254,6 +256,7 @@ void    Server::join(User* user, std::vector<std::string> & argsVector){
             _channels.back().addUserToChannel(user->getNickName());
             _channels.back().addUserToChannelOperators(user->getNickName());
             buildResponseToSend(NULL, user, repliesMessage("331", user) + _channels.back().getChannelName() + " :No topic is set");
+            buildResponseToSend(user, user, "JOIN " + *argsIt);
             listOfChannelMembers(_channels.back(), user);
         }   
     }
@@ -432,6 +435,8 @@ void    Server::showChannelModes(User * user, Channel * channel){
         mode = mode + "s";
     if (channel->getOperatorsTopicControlStatus())
         mode = mode + "t";
+    if (channel->getInviteOnlyChannelStatus())
+        mode = mode + "i";
     if (channel->getMaxMembers() != 0)
         mode = mode + "l" + std::to_string(channel->getMaxMembers());
     if (mode == " +")
@@ -507,10 +512,18 @@ void    Server::channelModes(User * user, Channel *channel, std::vector<std::str
         }
         else if (modeLine[i] == 'n')
             channel->setAllowOutMessage(user->getNickName(), !addMode);
-        else if (modeLine[i] == 'p')
+        else if (modeLine[i] == 'p'){
+            if (channel->getSecretChannelStatus())
+                channel->setSecretChannel(user->getNickName(), false);
             channel->setPrivateChannel(user->getNickName(), addMode);
-        else if (modeLine[i] == 's')
+        }
+        else if (modeLine[i] == 's'){
+            if (channel->getPrivateChannelStatus())
+                channel->setPrivateChannel(user->getNickName(), false);
             channel->setSecretChannel(user->getNickName(), addMode);
+        }
+        else if (modeLine[i] == 'i')
+            channel->setInviteOnlyChannel(user->getNickName(), addMode);
         else if (modeLine[i] == 't')
             channel->setOperatorsTopicControl(user->getNickName(), addMode);
         else if (modeLine[i] == 'l'){

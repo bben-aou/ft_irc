@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: blind-eagle <blind-eagle@student.42.fr>    +#+  +:+       +#+        */
+/*   By: bben-aou <bben-aou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/05 12:28:55 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/03/05 19:35:12 by blind-eagle      ###   ########.fr       */
+/*   Updated: 2023/03/06 17:53:16 by bben-aou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -385,6 +385,12 @@ int   Server::parser(std::string buffer, int index){
             std::string chanTopic = getWordInLine(line, &(posPointer));
             topic(&_users[index], channel, chanTopic);
         }
+        else if (command == "BOT"){
+            std::string     service = getWordInLine(line, &(posPointer));
+            std::string     channelType = getWordInLine(line, &(posPointer));
+            bot(&_users[index], service, channelType);
+            std::cout << "sould be done !" << std::endl; 
+        }
         i += 2;
         line.erase();
     }
@@ -421,6 +427,8 @@ bool    Server::checkCommandValidation(std::string command){
     if (command == "TOPIC")
         return (true);
     if (command == "MODE")
+        return (true);
+    if (command == "BOT")
         return (true);
     return (false);
 }
