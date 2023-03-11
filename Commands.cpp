@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Commands.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bben-aou <bben-aou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mes-sadk <mes-sadk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 02:53:28 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/03/08 11:43:06 by bben-aou         ###   ########.fr       */
+/*   Updated: 2023/03/08 14:25:54 by mes-sadk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -587,7 +587,7 @@ void    Server::kick(User * user, std::string channel, std::string target, std::
 }
 
 
-// & ------------- Command : + NAMES V2+ ---------------------- 
+// & ------------- Command : + NAMES + ---------------------- 
 
 void    Server::names(User * user, std::vector<std::string> & channels){
     std::vector<Channel>::iterator      chanIt;
@@ -625,8 +625,7 @@ void    Server::names(User * user, std::vector<std::string> & channels){
     }
     else{
         if (_channels.empty()){
-            // buildResponseToSend(NULL, user, repliesMessage("366", user) + "" + " :End of NAMES list");
-            std::cout << "there is no channel created yet !" << std::endl;
+            buildResponseToSend(NULL, user, repliesMessage("366", user) + "" + " :End of NAMES list");
             return;
         }
         for (chanIt = _channels.begin(); chanIt != _channels.end(); ++chanIt){

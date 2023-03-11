@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bben-aou <bben-aou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mes-sadk <mes-sadk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/05 12:28:55 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/03/08 11:51:40 by bben-aou         ###   ########.fr       */
+/*   Updated: 2023/03/08 14:13:54 by mes-sadk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,7 +155,7 @@ void    Server::handlingEvents(){
                 this->_users[index].joinPollExtractedData(buffer);
                 // there is nothing to read from the client and the file descriptor is closed :
                 if (readStatus == 0){
-                    printf("Fd is = %d |  Revents is = %d\n", it->fd, it->revents);
+                    std::cout << "Fd is = " << it->fd << " |  Revents is = " <<  it->revents << std::endl;
                     quit(&_users[index],"");
                     close(it->fd);
                     it = this->_fds.erase(it);
@@ -167,7 +167,7 @@ void    Server::handlingEvents(){
 
                 else if (int command = itsCommand(_users[index].getPollExtractedData())){
                     if (parser(_users[index].getPollExtractedData().substr(0, command), index) == 1){
-						printf("Fd is = %d |  Revents is = %d\n", it->fd, it->revents);
+						std::cout << "Fd is = " << it->fd << " |  Revents is = " <<  it->revents << std::endl;
                         close(it->fd);
                         it = _fds.erase(it);
                         _users.erase(_users.begin() + index);
@@ -308,7 +308,7 @@ int   Server::parser(std::string buffer, int index){
             std::string              partReasonMessage = getWordInLine(line, &(posPointer));
             part(&_users[index], channels, partReasonMessage);   
         }
-        else if (command == "PING"){
+        else if (command == "PONG"){
             std::cout << "The Command Is : PING" << std::endl;
             std::string message = getWordInLine(line, &(posPointer));
             pong(&_users[index], message);
@@ -367,14 +367,14 @@ int   Server::parser(std::string buffer, int index){
     return (0);
 }
 
-bool    Server::checkCommandValidation(std::string command){
+bool    Server::checkCommandValidation(std::string command) {
     if (command == "PASS")
         return (true);
     if (command == "NICK")
         return (true);
     if (command == "USER")
         return (true);
-    if (command == "PING")
+    if (command == "PONG")
         return (true);
     if (command == "JOIN")
         return (true);

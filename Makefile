@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: bben-aou <bben-aou@student.42.fr>          +#+  +:+       +#+         #
+#    By: mes-sadk <mes-sadk@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/08 15:11:24 by blind-eagle       #+#    #+#              #
-#    Updated: 2023/03/08 11:45:29 by bben-aou         ###   ########.fr        #
+#    Updated: 2023/03/08 14:22:03 by mes-sadk         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,7 +27,7 @@ HDRS = User.hpp \
 	   Channel.hpp \
 	   Server.hpp 
 
-OBJ = $(SRC:.cpp=.o)
+OBJ = $(SRC:.cpp=.opp)
 
 all : $(NAME)
 
@@ -35,7 +35,7 @@ $(NAME): $(OBJ) $(HDRS)
 	@c++ $(CFLAGS) $(OBJ) -o $@
 	@echo "\033[0;36m ⚙️  MakeFile ⚙️ : ✅ COMPILED SUCCESSFULY\033[0m"
 
-%.o:%.cpp  
+%.opp:%.cpp  
 	@c++ $(CFLAGS) -o $@ -c $<
 clean :
 	@rm -f $(OBJ)
