@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: blind-eagle <blind-eagle@student.42.fr>    +#+  +:+       +#+        */
+/*   By: bben-aou <bben-aou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/08 15:01:33 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/02/08 15:08:35 by blind-eagle      ###   ########.fr       */
+/*   Created: 2023/02/08 15:01:33 by bben-aou          #+#    #+#             */
+/*   Updated: 2023/03/11 15:06:25 by bben-aou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./User.hpp"
-#include "./Server.hpp"
+#include "./User/user.hpp"
+#include "./Server/server.hpp"
 
 
 int main(int argc, char **argv){

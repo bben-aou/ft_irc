@@ -5,15 +5,15 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: bben-aou <bben-aou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/12 03:46:06 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/03/06 09:32:17 by bben-aou         ###   ########.fr       */
+/*   Created: 2023/02/12 03:46:06 by bben-aou          #+#    #+#             */
+/*   Updated: 2023/03/11 15:07:12 by bben-aou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef     CHANNEL_HPP
 #define     CHANNEL_HPP
 
-#include "./User.hpp"
+#include "../User/user.hpp"
 
 #include <string>
 #include <iostream>

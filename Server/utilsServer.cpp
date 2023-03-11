@@ -6,11 +6,11 @@
 /*   By: bben-aou <bben-aou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/23 03:22:18 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/03/08 11:45:03 by bben-aou         ###   ########.fr       */
+/*   Updated: 2023/03/11 14:50:38 by bben-aou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./Server.hpp"
+#include "./server.hpp"
 
 std::string     Server::getCurrentDate(){
     // Get the current time
@@ -58,7 +58,7 @@ void    Server::sendResponse(pollfd fds, std::string data) const{
     prefixPos = 0;
     if (data[0] == ':'){
         prefixPos = 1;
-        prefix = getWordInLine(data, &prefixPos);
+        prefix = getCommandInLine(data, &prefixPos);
         prefix = ":" + prefix; 
     }
     int i = prefixPos;
@@ -134,6 +134,6 @@ void    Server::welcome(User * user){
     buildResponseToSend(NULL, user , repliesMessage("001", user) + "Welcome to the Internet Relay Network " + user->getNickName() + "!" + user->getUserName() + "@" + user->getHostName());
     buildResponseToSend(NULL, user, repliesMessage("002", user) + "Your host is " + _serverName + ", running version 13.37");
     buildResponseToSend(NULL, user, repliesMessage("003", user) + "This server was created " + getCurrentDate());
-    buildResponseToSend(NULL, user, repliesMessage("004", user) + _serverName + " 13.37 i k nlov");
+    buildResponseToSend(NULL, user, repliesMessage("004", user) + _serverName + " 13.37 ilospnt");
 }
 

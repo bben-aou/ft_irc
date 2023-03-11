@@ -6,15 +6,15 @@
 /*   By: bben-aou <bben-aou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/05 12:28:52 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/03/08 11:45:57 by bben-aou         ###   ########.fr       */
+/*   Updated: 2023/03/11 13:41:09 by bben-aou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef  SERVER_HPP
 # define SERVER_HPP
 
-#include "./User.hpp"
-#include "./Channel.hpp"
+#include "../User/user.hpp"
+#include "../Channel/channel.hpp"
 #include <chrono>
 #include <ctime>
 #include <string>
@@ -113,10 +113,10 @@ class   Server{
     int     itsCommand(std::string line);
     int     parser(std::string buffer, int index);
     
-    std::string     getWordInLine(std::string line,int* posPointer) const;
+    std::string     getCommandInLine(std::string line,int* posPointer) const;
     std::vector<std::string>     getVectorOfArgs(std::string line, int* posPointer);
     bool            checkCommandValidation(std::string  command);
-    void            userNotLoginIn(User* user) const;
+    void            userIsNotLoggedIn(User* user) const;
     void            buildResponseToSend(User const * senderUser, User const * recipientUser, std::string data) const;
     void            buildResponseToSendToChanMembers(User const * senderUser, Channel const & channel, std::string data) const;
     void            sendResponse(pollfd fds, std::string data) const;

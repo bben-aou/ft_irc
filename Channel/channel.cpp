@@ -5,12 +5,12 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: bben-aou <bben-aou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/12 03:46:09 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/03/06 09:23:29 by bben-aou         ###   ########.fr       */
+/*   Created: 2023/02/12 03:46:09 by bben-aou          #+#    #+#             */
+/*   Updated: 2023/03/11 15:07:05 by bben-aou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./Channel.hpp"
+#include "./channel.hpp"
 
 
 Channel::Channel(){

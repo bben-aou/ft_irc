@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   User.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: blind-eagle <blind-eagle@student.42.fr>    +#+  +:+       +#+        */
+/*   By: bben-aou <bben-aou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/05 02:16:12 by blind-eagle       #+#    #+#             */
-/*   Updated: 2023/02/22 01:26:16 by blind-eagle      ###   ########.fr       */
+/*   Created: 2023/02/05 02:16:12 by bben-aou          #+#    #+#             */
+/*   Updated: 2023/03/11 15:06:37 by bben-aou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./User.hpp"
+#include "./user.hpp"
 
 User::User(){
     this->_userName = "";
